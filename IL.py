@@ -45,7 +45,7 @@ def setup_vectorstore(_documents):
 
 def create_chain(vector_store):
     """Creates a conversational retrieval chain."""
-    llm = ChatGroq(model="llama3-70b-8192", temperature=0.3, groq_api_key=groq_api_key)
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.3, groq_api_key=groq_api_key)
     retriever = vector_store.as_retriever()
 
     memory = ConversationBufferMemory(
@@ -201,5 +201,6 @@ if st.session_state.show_source_dialog and st.session_state.current_source_path:
             """
         st.markdown(iframe_html, unsafe_allow_html=True)
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
 
 
