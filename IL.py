@@ -118,7 +118,7 @@ if uploaded_files:
     reset_chat()
 
 ### Main UI
-st.image("InsightLens_logo.png", width=400)
+st.image("assets/InsightLens_logo.png", width=400)
 if not uploaded_files:
     st.write("Upload a file to start chatting with InsightLens.")
 
@@ -201,3 +201,4 @@ if st.session_state.show_source_dialog and st.session_state.current_source_path:
             """
         st.markdown(iframe_html, unsafe_allow_html=True)
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
