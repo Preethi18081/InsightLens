@@ -1,7 +1,7 @@
 import base64
 import tempfile
 import streamlit as st
-from langchain_community.document_loaders import UnstructuredPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -28,7 +28,7 @@ st.set_page_config(
 @st.cache_data
 def load_document(file_path):
     """Reads and loads data from PDF and returns LangChain documents."""
-    loader = UnstructuredPDFLoader(file_path)
+    loader = PyPDFLoader(file_path)
     documents = loader.load()
     for doc in documents:
         doc.metadata["source"] = file_path
@@ -201,4 +201,5 @@ if st.session_state.show_source_dialog and st.session_state.current_source_path:
             """
         st.markdown(iframe_html, unsafe_allow_html=True)
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
 
