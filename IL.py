@@ -109,25 +109,31 @@ if uploaded_files:
         st.session_state.pdf_sources = {}
 
     for uploaded_file in uploaded_files:
-        # Read the file as bytes
+        file_name = uploaded_file.name  # human-friendly name
         file_bytes = uploaded_file.getvalue()
 
-        # Create a temporary file for PyPDFLoader to read
+        # Create a temporary file for PyPDFLoader
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
             tmp_file.write(file_bytes)
             tmp_file.flush()
             file_path = tmp_file.name
 
-        # Load and store documents
+        # Load documents and add readable metadata
         documents = load_document(file_path)
+        for doc in documents:
+            doc.metadata["source_name"] = file_name   # user-visible name
+            doc.metadata["temp_path"] = file_path     # for internal tracking
         all_docs.extend(documents)
 
-        # Store base64 PDF in session state for preview
+        # Store PDF (base64 + temp path) in session for preview
         pdf_base64 = base64.b64encode(file_bytes).decode("utf-8")
-        st.session_state.pdf_sources[file_path] = pdf_base64
+        st.session_state.pdf_sources[file_name] = {
+            "base64": pdf_base64,
+            "temp_path": file_path,
+        }
 
         if "source_path" not in st.session_state:
-            st.session_state.source_path = file_path 
+            st.session_state.source_path = file_name
 
     # Build vector store and chain
     st.session_state.vector_store = setup_vectorstore(all_docs)
@@ -135,6 +141,7 @@ if uploaded_files:
 
     st.sidebar.success(f"Processed {len(uploaded_files)} file(s)")
     reset_chat()
+
 
 
 ### Main UI
@@ -179,11 +186,17 @@ if user_input:
                 st.markdown(assistant_response)
 
                 if has_source and response.get("source_documents"):
-                    first_source = response["source_documents"][0].metadata.get("source", "Unknown")
-                    st.markdown(f"**Response Source:** {first_source}")
-                    st.session_state.current_source_path = first_source
-                    def show_source(): st.session_state.show_source_dialog = True
-                    st.button("View Source", on_click=show_source)
+                    first_doc = response["source_documents"][0]
+                    source_name = first_doc.metadata.get("source_name", "Unknown")
+                
+                    st.markdown(f"**Response Source:** {source_name}")
+                    st.session_state.current_source_path = source_name
+
+    def show_source():
+        st.session_state.show_source_dialog = True
+
+    st.button("View Source", on_click=show_source)
+
 
             except Exception as e:
                 assistant_response = f"Error: {str(e)}"
@@ -210,14 +223,16 @@ with st.sidebar:
                         Queries per Minute: {len(st.session_state.query_timestamps)}  
                         Max RPM: 30""")
 
-# Source preview dialog (in-memory)
+# Source preview dialog (in-memory, multi-file aware)
 if st.session_state.show_source_dialog and st.session_state.current_source_path:
     with st.container():
         st.markdown("### Source Document Preview")
 
-        pdf_data = st.session_state.pdf_sources.get(st.session_state.current_source_path)
+        source_name = st.session_state.current_source_path
+        source_entry = st.session_state.pdf_sources.get(source_name)
 
-        if pdf_data:
+        if source_entry and "base64" in source_entry:
+            pdf_data = source_entry["base64"]
             iframe_html = f"""
             <iframe src="data:application/pdf;base64,{pdf_data}" width="100%" height="500px" style="border:none;"></iframe>
             """
@@ -226,6 +241,7 @@ if st.session_state.show_source_dialog and st.session_state.current_source_path:
             st.warning("⚠️ Source file not available in memory.")
 
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
 
 
 
