@@ -115,7 +115,7 @@ def sanitize_json(raw):
 
 # --- Streamlit UI ---
 
-st.image("InsightLens_logo.png", width=400)
+st.image("assets/InsightLens_logo.png", width=400)
 st.sidebar.header("📂 Upload Documents")
 
 uploaded_files = st.sidebar.file_uploader(
@@ -196,4 +196,5 @@ st.session_state.query_timestamps = [t for t in st.session_state.query_timestamp
 
 st.sidebar.divider()
 st.sidebar.markdown(f"**Queries per Minute:** {len(st.session_state.query_timestamps)} / 30")
+
 
