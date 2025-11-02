@@ -5,7 +5,6 @@ import json
 import re
 from io import BytesIO
 import streamlit as st
-from dotenv import load_dotenv
 
 from langchain_community.document_loaders import (
     UnstructuredPDFLoader,
@@ -21,9 +20,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 
-# Load environment
-load_dotenv()
-groq_api_key = os.getenv('GROQ_API_KEY')
+groq_api_key = st.secrets["GROQ_API_KEY"]
 
 # Streamlit page setup
 st.set_page_config(page_title="InsightLens", page_icon="💬", layout="wide")
@@ -199,3 +196,4 @@ st.session_state.query_timestamps = [t for t in st.session_state.query_timestamp
 
 st.sidebar.divider()
 st.sidebar.markdown(f"**Queries per Minute:** {len(st.session_state.query_timestamps)} / 30")
+
