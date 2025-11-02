@@ -95,7 +95,8 @@ def reset_chat():
     st.session_state.show_source_dialog = False
     st.session_state.current_source_path = None
 
-
+def show_source():
+    st.session_state.show_source_dialog = True
 ### Sidebar – Upload PDFs
 st.sidebar.title("📂 Upload Documents")
 
@@ -163,7 +164,6 @@ for message in st.session_state.chat_history:
 
 # User input
 user_input = st.chat_input("Ask InsightLens...")
-
 if user_input:
     st.session_state.chat_history.append({'role': 'user', 'content': user_input})
     with st.chat_message("user"):
@@ -188,21 +188,53 @@ if user_input:
                 if has_source and response.get("source_documents"):
                     first_doc = response["source_documents"][0]
                     source_name = first_doc.metadata.get("source_name", "Unknown")
-                
+
                     st.markdown(f"**Response Source:** {source_name}")
                     st.session_state.current_source_path = source_name
 
-                    def show_source():
-                        st.session_state.show_source_dialog = True
-                
                     st.button("View Source", on_click=show_source)
-
 
             except Exception as e:
                 assistant_response = f"Error: {str(e)}"
                 st.markdown(assistant_response)
-        
+
         st.session_state.chat_history.append({"role": "assistant", "content": assistant_response})
+# if user_input:
+#     st.session_state.chat_history.append({'role': 'user', 'content': user_input})
+#     with st.chat_message("user"):
+#         st.markdown(user_input)
+    
+#     with st.chat_message("assistant"):
+#         if not uploaded_files:
+#             assistant_response = "Upload a file first."
+#         else:
+#             try:
+#                 response = st.session_state.conversation_chain({"question": user_input})
+#                 try:
+#                     structured_response = json.loads(response['answer'])
+#                     assistant_response = structured_response["answer"]
+#                     has_source = structured_response["has_source"]
+#                 except (json.JSONDecodeError, KeyError):
+#                     assistant_response = response['answer']
+#                     has_source = len(response.get("source_documents", [])) > 0
+
+#                 st.markdown(assistant_response)
+
+#                 if has_source and response.get("source_documents"):
+#                     first_doc = response["source_documents"][0]
+#                     source_name = first_doc.metadata.get("source_name", "Unknown")
+                
+#                     st.markdown(f"**Response Source:** {source_name}")
+#                     st.session_state.current_source_path = source_name
+        
+#                     st.button("View Source", on_click=show_source)
+        
+
+#             except Exception as e:
+#                 assistant_response = f"Error: {str(e)}"
+#                 st.markdown(assistant_response)
+        
+#         st.session_state.chat_history.append({"role": "assistant", "content": assistant_response})
 
 # RPM tracking
 if "query_timestamps" not in st.session_state:
@@ -241,6 +273,7 @@ if st.session_state.show_source_dialog and st.session_state.current_source_path:
             st.warning("⚠️ Source file not available in memory.")
 
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
 
 
 
