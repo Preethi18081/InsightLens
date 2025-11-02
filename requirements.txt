@@ -40,16 +40,10 @@ scipy>=1.13.0
 pypdf>=4.2.0
 pdfminer.six==20221105  # stable version, avoids open_filename import errors
 
-# -----------------------------
-# Visualization / formatting
-# -----------------------------
-markdown-it-py>=4.0.0
-mdurl>=0.1.2
-pygments>=2.19.2
-rich>=14.2.0
 
 # -----------------------------
 # Block unstructured explicitly
 # -----------------------------
 # Prevents Streamlit Cloud auto-install from pulling heavy deps
 --no-binary=unstructured
+
