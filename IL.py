@@ -6,7 +6,7 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
-from langchain.memory import ConversationBufferMemory
+from langchain_community.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 import json
@@ -201,6 +201,7 @@ if st.session_state.show_source_dialog and st.session_state.current_source_path:
             """
         st.markdown(iframe_html, unsafe_allow_html=True)
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
 
 
 
