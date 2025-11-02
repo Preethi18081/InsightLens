@@ -1,17 +1,48 @@
-streamlit
-pillow
-langchain==0.2.14
-langchain-community
-langchain-groq
-langchain-text-splitters
-faiss-cpu
-sentence-transformers
-huggingface-hub
-pypdf
-numpy
-pandas
-scikit-learn
-scipy
-tqdm
-requests
+# -----------------------------
+# Core framework & utilities
+# -----------------------------
+streamlit>=1.39.0
+pillow>=10.4.0
+requests>=2.32.0
+tqdm>=4.66.4
 
+# -----------------------------
+# LangChain ecosystem (latest compatible versions)
+# -----------------------------
+langchain==0.2.14
+langchain-community==0.2.14
+langchain-text-splitters>=0.2.2
+langchain-groq>=0.1.2
+langchain-huggingface>=0.0.5  # replaces deprecated embeddings class
+
+# -----------------------------
+# Embeddings / Transformers
+# -----------------------------
+sentence-transformers>=3.0.1
+huggingface-hub>=0.25.0
+
+# -----------------------------
+# Vector storage
+# -----------------------------
+faiss-cpu>=1.8.0
+
+# -----------------------------
+# Data handling & ML
+# -----------------------------
+numpy>=1.26.0
+pandas>=2.2.2
+scikit-learn>=1.5.0
+scipy>=1.13.0
+
+# -----------------------------
+# PDF processing
+# -----------------------------
+pypdf>=4.2.0
+unstructured
+# -----------------------------
+# Visualization / formatting
+# -----------------------------
+markdown-it-py>=4.0.0
+mdurl>=0.1.2
+pygments>=2.19.2
+rich>=14.2.0
