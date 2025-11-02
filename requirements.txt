@@ -1,6 +1,6 @@
 streamlit
 pillow
-langchain
+langchain==0.2.14
 langchain-community
 langchain-groq
 langchain-text-splitters
@@ -14,3 +14,4 @@ scikit-learn
 scipy
 tqdm
 requests
+
