@@ -192,10 +192,10 @@ if user_input:
                     st.markdown(f"**Response Source:** {source_name}")
                     st.session_state.current_source_path = source_name
 
-    def show_source():
-        st.session_state.show_source_dialog = True
-
-    st.button("View Source", on_click=show_source)
+                    def show_source():
+                        st.session_state.show_source_dialog = True
+                
+                    st.button("View Source", on_click=show_source)
 
 
             except Exception as e:
@@ -241,6 +241,7 @@ if st.session_state.show_source_dialog and st.session_state.current_source_path:
             st.warning("⚠️ Source file not available in memory.")
 
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
 
 
 
