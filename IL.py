@@ -12,6 +12,7 @@ from langchain.prompts import PromptTemplate
 import json
 import time
 from collections import deque
+from io import BytesIO
 
 # Load API key from Streamlit Secrets
 groq_api_key = st.secrets["GROQ_API_KEY"]
@@ -102,20 +103,39 @@ uploaded_files = st.sidebar.file_uploader("Upload Your PDF File", type=['pdf'], 
 
 if uploaded_files:
     all_docs = []
+
+    # Initialize a dict to store PDFs in memory
+    if "pdf_sources" not in st.session_state:
+        st.session_state.pdf_sources = {}
+
     for uploaded_file in uploaded_files:
+        # Read the file as bytes
+        file_bytes = uploaded_file.getvalue()
+
+        # Create a temporary file for PyPDFLoader to read
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-            tmp_file.write(uploaded_file.getbuffer())
+            tmp_file.write(file_bytes)
+            tmp_file.flush()
             file_path = tmp_file.name
+
+        # Load and store documents
         documents = load_document(file_path)
         all_docs.extend(documents)
+
+        # Store base64 PDF in session state for preview
+        pdf_base64 = base64.b64encode(file_bytes).decode("utf-8")
+        st.session_state.pdf_sources[file_path] = pdf_base64
 
         if "source_path" not in st.session_state:
             st.session_state.source_path = file_path 
 
+    # Build vector store and chain
     st.session_state.vector_store = setup_vectorstore(all_docs)
     st.session_state.conversation_chain = create_chain(st.session_state.vector_store)
+
     st.sidebar.success(f"Processed {len(uploaded_files)} file(s)")
     reset_chat()
+
 
 ### Main UI
 st.image("assets/InsightLens_logo.png", width=400)
@@ -190,17 +210,24 @@ with st.sidebar:
                         Queries per Minute: {len(st.session_state.query_timestamps)}  
                         Max RPM: 30""")
 
-# Source preview dialog
+# Source preview dialog (in-memory)
 if st.session_state.show_source_dialog and st.session_state.current_source_path:
     with st.container():
         st.markdown("### Source Document Preview")
-        with open(st.session_state.current_source_path, "rb") as file:
-            pdf_data = base64.b64encode(file.read()).decode("utf-8")
+
+        pdf_data = st.session_state.pdf_sources.get(st.session_state.current_source_path)
+
+        if pdf_data:
             iframe_html = f"""
             <iframe src="data:application/pdf;base64,{pdf_data}" width="100%" height="500px" style="border:none;"></iframe>
             """
-        st.markdown(iframe_html, unsafe_allow_html=True)
+            st.markdown(iframe_html, unsafe_allow_html=True)
+        else:
+            st.warning("⚠️ Source file not available in memory.")
+
         st.button("Close", on_click=lambda: st.session_state.update({"show_source_dialog": False}))
+
+
 
 
 
